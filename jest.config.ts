@@ -12,5 +12,6 @@ export default {
   coveragePathIgnorePatterns: [
     '.*-protocols\\.ts$',
     'presentation/protocols'
-  ]
+  ],
+  preset: '@shelf/jest-mongodb'
 }
