@@ -28,17 +28,17 @@ const makeAddAccountRepository = (): AddAccountRepository => {
 interface SutTypes {
   sut: DbAddAccount
   encrypterStub: Encrypter
-  addAccountRepositoriStub: AddAccountRepository
+  addAccountRepositoryStub: AddAccountRepository
 }
 
 const makeSut = (): SutTypes => {
   const encrypterStub = makeEncrypter()
-  const addAccountRepositoriStub = makeAddAccountRepository()
-  const sut = new DbAddAccount(encrypterStub, addAccountRepositoriStub)
+  const addAccountRepositoryStub = makeAddAccountRepository()
+  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
   return {
     sut,
     encrypterStub,
-    addAccountRepositoriStub
+    addAccountRepositoryStub
   }
 }
 
@@ -68,8 +68,8 @@ describe('DbAddAccount Usecase', () => {
   })
 
   test('Should call AddAccountRepository with correct password values', async () => {
-    const { sut, addAccountRepositoriStub } = makeSut()
-    const addSpy = jest.spyOn(addAccountRepositoriStub, 'add')
+    const { sut, addAccountRepositoryStub } = makeSut()
+    const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
     const accountData = {
       name: 'any_name',
       email: 'any@email.com',
@@ -77,6 +77,34 @@ describe('DbAddAccount Usecase', () => {
     }
     await sut.add(accountData)
     expect(addSpy).toHaveBeenCalledWith({
+      name: 'any_name',
+      email: 'any@email.com',
+      password: 'hashed_password'
+    })
+  })
+
+  test('Should throw if addAccountRepository with throws', async () => {
+    const { sut, addAccountRepositoryStub } = makeSut()
+    jest.spyOn(addAccountRepositoryStub, 'add').mockResolvedValueOnce(new Promise((resolve, reject) => { reject(new Error()) }))
+    const accountData = {
+      name: 'any_name',
+      email: 'any@email.com',
+      password: 'any_password'
+    }
+    const promise = sut.add(accountData)
+    await expect(promise).rejects.toThrow()
+  })
+
+  test('Should returns an account on success', async () => {
+    const { sut } = makeSut()
+    const accountData = {
+      name: 'any_name',
+      email: 'any@email.com',
+      password: 'any_password'
+    }
+    const account = await sut.add(accountData)
+    expect(account).toEqual({
+      id: 'valid_id',
       name: 'any_name',
       email: 'any@email.com',
       password: 'hashed_password'
