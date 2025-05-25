@@ -8,5 +8,9 @@ export default {
   testEnvironment: 'node',
   transform: {
     '.+\\.ts$': 'ts-jest'
-  }
+  },
+  coveragePathIgnorePatterns: [
+    '.*-protocols\\.ts$',
+    'presentation/protocols'
+  ]
 }
