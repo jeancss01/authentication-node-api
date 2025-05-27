@@ -1,17 +1,18 @@
-export default {
+module.exports = {
+  preset: '@shelf/jest-mongodb',
+  testEnvironment: 'node',
+  testTimeout: 10000,
   roots: ['<rootDir>/src'],
   collectCoverageFrom: [
     '<rootDir>/src/**/*.ts',
     '!<rootDir>/src/main/**'
   ],
   coverageDirectory: 'coverage',
-  testEnvironment: 'node',
   transform: {
     '.+\\.ts$': 'ts-jest'
   },
   coveragePathIgnorePatterns: [
     '.*-protocols\\.ts$',
     'presentation/protocols'
-  ],
-  preset: '@shelf/jest-mongodb'
+  ]
 }

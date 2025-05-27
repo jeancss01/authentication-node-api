@@ -1,0 +1,26 @@
+# Indica que este é o arquivo de configuração principal
+root = true
+
+# Regras padrão para todos os arquivos
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Arquivos JSON, JS, TS, e configuração
+[*.{js,ts,json,tsx,jsx}]
+indent_style = space
+indent_size = 2
+
+# Markdown: manter espaços ao final das linhas para quebra manual
+[*.md]
+trim_trailing_whitespace = false
+insert_final_newline = true
+
+# YAML (por exemplo, arquivos .yml do GitHub Actions)
+[*.yml]
+indent_style = space
+indent_size = 2
