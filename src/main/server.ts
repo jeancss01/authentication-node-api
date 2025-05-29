@@ -1,3 +1,11 @@
-import app from './config/app'
+import { MongoHelper } from '../infra/db/mongodb/helpers/mongo-helpers'
+import env from './config/env'
 
-app.listen(5050, () => { console.log('Server is running on port 5050') })
+MongoHelper.connect(env.mongoUrl)
+  .then(async () => {
+    const app = (await import('./config/app')).default
+    app.listen(env.port, () => { console.log(`Server is running on port ${env.port}`) })
+  }).catch((error) => {
+    console.error('Failed to connect to MongoDB:', error)
+    process.exit(1) // Exit the process with a failure code
+  })
