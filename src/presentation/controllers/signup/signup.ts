@@ -35,7 +35,8 @@ export class SignUpController implements Controller {
 
       return ok(account)
     } catch (error) {
-      return serverError()
+      const err = error instanceof Error ? error : new Error(String(error))
+      return serverError(err)
     }
   }
 }
