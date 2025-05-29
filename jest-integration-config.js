@@ -1,4 +1,3 @@
-import config from './jest.config.js'
-config.testMatch = ['**/*.test.js']
+const config = require('./jest.config.ts')
+config.testMatch = ['**/*.test.ts']
 module.exports = config
-// This file is used to run unit tests only
