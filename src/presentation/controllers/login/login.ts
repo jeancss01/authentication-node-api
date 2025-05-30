@@ -1,5 +1,5 @@
 import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
-import { badRequest } from '../../helpers/http-helper'
+import { badRequest, serverError } from '../../helpers/http-helper'
 import type { HttpRequest, HttpResponse, Controller } from '../../protocols'
 import { type EmailValidator } from '../signup/signup-protocols'
 
@@ -11,25 +11,29 @@ export class LoginController implements Controller {
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-    const { email, password } = httpRequest.body
-    if (!email) {
-      return await new Promise(resolve => {
-        resolve(badRequest(new MissingParamError('email')))
-      })
-    }
-    if (!password) {
-      return await new Promise(resolve => {
-        resolve(badRequest(new MissingParamError('password')))
-      })
-    }
+    try {
+      const { email, password } = httpRequest.body
+      if (!email) {
+        return await new Promise(resolve => {
+          resolve(badRequest(new MissingParamError('email')))
+        })
+      }
+      if (!password) {
+        return await new Promise(resolve => {
+          resolve(badRequest(new MissingParamError('password')))
+        })
+      }
 
-    const isValid = this.emailValidator.isValid(String(httpRequest.body.email))
+      const isValid = this.emailValidator.isValid(email as string)
 
-    if (!isValid) {
-      return await new Promise(resolve => {
-        resolve(badRequest(new InvalidParamError('email')))
-      })
+      if (!isValid) {
+        return await new Promise(resolve => {
+          resolve(badRequest(new InvalidParamError('email')))
+        })
+      }
+      return badRequest(new ServerError('This is a placeholder for a successful response'))
+    } catch (error) {
+      return serverError(error as Error)
     }
-    return badRequest(new ServerError('This is a placeholder for a successful response'))
   }
 }
