@@ -1,9 +1,6 @@
-import { type Authentication } from '../../../domain/usecases/authentication'
-import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
-import { badRequest, serverError } from '../../helpers/http-helper'
-import type { HttpRequest, HttpResponse, Controller } from '../../protocols'
-import { type EmailValidator } from '../signup/signup-protocols'
-
+import { InvalidParamError, MissingParamError } from '../../errors'
+import { badRequest, serverError, unauthorized } from '../../helpers/http-helper'
+import type { HttpRequest, HttpResponse, Controller, Authentication, EmailValidator } from './login-protocols'
 export class LoginController implements Controller {
   private readonly emailValidator: EmailValidator
   private readonly authentication: Authentication
@@ -25,17 +22,21 @@ export class LoginController implements Controller {
       }
 
       const isValid = this.emailValidator.isValid(email as string)
-
       if (!isValid) {
         return badRequest(new InvalidParamError('email'))
       }
 
       const accessToken = await this.authentication.auth(email as string, password as string)
-
       if (!accessToken) {
-        return badRequest(new InvalidParamError('credentials'))
+        return unauthorized()
       }
-      return badRequest(new ServerError('This is a placeholder for a successful response'))
+
+      return {
+        statusCode: 200,
+        body: {
+          accessToken
+        }
+      }
     } catch (error) {
       return serverError(error as Error)
     }
