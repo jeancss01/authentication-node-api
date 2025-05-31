@@ -1,6 +1,6 @@
-import { type LogErrorRepository } from '../../data/protocols/log-error-repository'
+import type { LogErrorRepository } from '../../data/protocols/db/log-error-repository'
 import type { Controller, HttpRequest, HttpResponse } from '../../presentation/protocols'
-// This file defines a LogControllerDecorator that wraps a Controller to log errors.
+
 export class LogControllerDecorator implements Controller {
   private readonly controller: Controller
   private readonly logErrorRepository: LogErrorRepository
