@@ -1,5 +1,5 @@
 import type { HttpResponse, HttpRequest, Controller, AddAccount, Validation } from './signup-protocols'
-import { badRequest, serverError, ok } from '../../helpers/http-helper'
+import { badRequest, serverError, ok } from '../../helpers/http/http-helper'
 
 export class SignUpController implements Controller {
   private readonly addAccount: AddAccount
@@ -25,8 +25,7 @@ export class SignUpController implements Controller {
 
       return ok(account)
     } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error))
-      return serverError(err)
+      return serverError(error as Error)
     }
   }
 }
