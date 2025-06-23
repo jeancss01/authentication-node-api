@@ -1,6 +1,7 @@
 export interface HttpResponse {
   statusCode: number
   body: any
+  isRedirect?: boolean
 }
 
 export interface HttpRequest {
