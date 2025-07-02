@@ -4,8 +4,6 @@ export interface Authorization {
 export interface AuthorizationModel {
   clientId: string
   redirectUri: string
-  email: string
-  password: string
   codeChallenge: string
   codeChallengeMethod: string
 }

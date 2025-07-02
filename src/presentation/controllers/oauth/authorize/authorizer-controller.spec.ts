@@ -1,8 +1,8 @@
-import { badRequest, ok, unauthorized, serverError } from '../../helpers/http/http-helper'
-import type { Authorization } from '../../../domain/usecases/authorization'
-import type { Validation } from '../../protocols/validation'
+import { badRequest, ok, unauthorized, serverError } from '../../../helpers/http/http-helper'
+import type { Authorization } from '../../../../domain/usecases/oauth/authorize'
+import type { Validation } from '../../../protocols/validation'
 import { AuthorizerController } from './authorizer-controller'
-import type { HttpRequest } from '../../protocols'
+import type { HttpRequest } from '../../../protocols'
 
 const makeFakeRequest = (): HttpRequest => ({
   query: {

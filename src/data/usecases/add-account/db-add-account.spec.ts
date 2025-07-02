@@ -3,6 +3,10 @@ import { DbAddAccount } from './db-add-account'
 
 const makeHasher = (): Hasher => {
   class HasherStub implements Hasher {
+    async createHash (value: string): Promise<string> {
+      return await new Promise(resolve => { resolve('hashed_value') })
+    }
+
     async hash (value: string): Promise<string> {
       return await new Promise(resolve => { resolve('hashed_password') })
     }

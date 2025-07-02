@@ -1,5 +1,5 @@
 import { type AuthCodeModel } from '../../../../domain/models/auth-code'
 
 export interface LoadAuthCodeRepository {
-  load: (id: string) => Promise<AuthCodeModel | null>
+  load: (code: string, clientId: string) => Promise<AuthCodeModel | null>
 }

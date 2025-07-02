@@ -4,6 +4,10 @@ import crypto from 'crypto'
 jest.mock('crypto', () => ({
   randomBytes: jest.fn().mockReturnValue({
     toString: jest.fn().mockReturnValue('hashed_value')
+  }),
+  createHash: jest.fn().mockReturnValue({
+    update: jest.fn().mockReturnThis(),
+    digest: jest.fn().mockReturnValue('hashed_value')
   })
 }))
 
@@ -23,5 +27,10 @@ describe('CryptoAdapter', () => {
       throw new Error()
     })
     await expect(cryptoAdapter.hash('some_value')).rejects.toThrow()
+  })
+  test('should call createHash with correct value', async () => {
+    const cryptoAdapter = makeSut()
+    const hash = await cryptoAdapter.createHash('some_value')
+    expect(hash).toBe('hashed_value')
   })
 })

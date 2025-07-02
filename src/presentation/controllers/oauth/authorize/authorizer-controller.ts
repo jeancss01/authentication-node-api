@@ -1,7 +1,7 @@
-import type { Authorization } from '../../../domain/usecases/authorization'
-import { badRequest, ok, serverError, unauthorized } from '../../helpers/http/http-helper'
-import type { Controller, HttpRequest, HttpResponse } from '../../protocols'
-import type { Validation } from '../../protocols/validation'
+import type { Authorization } from '../../../../domain/usecases/oauth/authorize'
+import { badRequest, ok, serverError, unauthorized } from '../../../helpers/http/http-helper'
+import type { Controller, HttpRequest, HttpResponse } from '../../../protocols'
+import type { Validation } from '../../../protocols/validation'
 
 export class AuthorizerController implements Controller {
   constructor (
@@ -15,12 +15,10 @@ export class AuthorizerController implements Controller {
       if (error) {
         return badRequest(error)
       }
-      const { clientId, redirectUri, email, password, codeChallenge, codeChallengeMethod } = httpRequest.query
+      const { clientId, redirectUri, codeChallenge, codeChallengeMethod } = httpRequest.query
       const redirectForUri = await this.authorization.authorize({
         clientId,
         redirectUri,
-        email,
-        password,
         codeChallenge,
         codeChallengeMethod
       })

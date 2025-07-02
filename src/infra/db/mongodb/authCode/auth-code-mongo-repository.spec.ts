@@ -32,7 +32,7 @@ describe('AuthCodeMongoRepository', () => {
     const authCode = await sut.add({
       code: 'any_code',
       clientId: 'any_client_id',
-      userId: 'any_user_id',
+      accountId: 'any_user_id',
       codeChallenge: 'any_code_challenge',
       codeChallengeMethod: 'S256',
       expiresAt: new Date(Date.now() + 1000 * 60 * 5), // 5 minutes from now
@@ -42,7 +42,7 @@ describe('AuthCodeMongoRepository', () => {
     expect(authCode.id).toBeTruthy()
     expect(authCode.code).toBe('any_code')
     expect(authCode.clientId).toBe('any_client_id')
-    expect(authCode.userId).toBe('any_user_id')
+    expect(authCode.accountId).toBe('any_user_id')
     expect(authCode.expiresAt).toEqual(expect.any(Date))
     expect(authCode.createdAt).toEqual(expect.any(Date))
   })
@@ -52,21 +52,36 @@ describe('AuthCodeMongoRepository', () => {
     await authCodeCollection.insertOne({
       code: 'any_code',
       clientId: 'any_client_id',
-      userId: 'any_user_id',
+      accountId: 'any_user_id',
       codeChallenge: 'any_code_challenge',
       codeChallengeMethod: 'S256',
       expiresAt: new Date(Date.now() + 1000 * 60 * 5), // 5 minutes from now
       createdAt: new Date()
     })
-    const authCode = await sut.load('any_code')
+    const authCode = await sut.load('any_code', 'any_client_id')
     expect(authCode).toBeTruthy()
     if (authCode) {
       expect(authCode.id).toBeTruthy()
       expect(authCode.code).toBe('any_code')
       expect(authCode.clientId).toBe('any_client_id')
-      expect(authCode.userId).toBe('any_user_id')
+      expect(authCode.accountId).toBe('any_user_id')
       expect(authCode.expiresAt).toEqual(expect.any(Date))
       expect(authCode.createdAt).toEqual(expect.any(Date))
     }
+  })
+  test('Should return null after auth code deletion', async () => {
+    const sut = makeSut()
+    await authCodeCollection.insertOne({
+      code: 'any_code',
+      clientId: 'any_client_id',
+      accountId: 'any_user_id',
+      codeChallenge: 'any_code_challenge',
+      codeChallengeMethod: 'S256',
+      expiresAt: new Date(Date.now() + 1000 * 60 * 5), // 5 minutes from now
+      createdAt: new Date()
+    })
+    await sut.delete('any_code', 'any_client_id')
+    const authCode = await sut.load('any_code', 'any_client_id')
+    expect(authCode).toBeFalsy()
   })
 })

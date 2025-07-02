@@ -3,7 +3,7 @@ import { type AuthCodeModel } from '../models/auth-code'
 export interface AddAuthCodeModel {
   code: string
   clientId: string
-  userId: string
+  accountId: string
   codeChallenge: string
   codeChallengeMethod: string
   expiresAt: Date
