@@ -29,7 +29,11 @@ describe('Account Mongo Repository', () => {
     const account = await sut.add({
       name: 'any_name',
       email: 'any_email',
-      password: 'any_password'
+      password: 'any_password',
+      brithday: 'any_brithday',
+      country: 'any_country',
+      city: 'any_city',
+      state: 'any_state'
     })
     expect(account).toBeTruthy()
     expect(account.id).toBeTruthy()
@@ -74,5 +78,27 @@ describe('Account Mongo Repository', () => {
     if (updatedAccount) {
       expect(updatedAccount.accessToken).toBe('any_token')
     }
+  })
+  test('Should return an account on get success', async () => {
+    const sut = makeSut()
+    const res = await accountCollection.insertOne({
+      name: 'any_name',
+      email: 'any_email@mail.com',
+      password: 'any_password'
+    })
+    const account = await sut.get(res.insertedId.toString())
+    expect(account).toBeTruthy()
+    if (account) {
+      expect(account.id).toBe(res.insertedId.toString())
+      expect(account.name).toBe('any_name')
+      expect(account.email).toBe('any_email@mail.com')
+      expect(account.password).toBe('any_password')
+    }
+  })
+
+  test('Should return null if get fails', async () => {
+    const sut = makeSut()
+    const account = await sut.get('6865a466896ad76a59b5639f')
+    expect(account).toBeFalsy()
   })
 })

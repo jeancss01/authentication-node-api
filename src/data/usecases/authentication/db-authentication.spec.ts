@@ -12,7 +12,11 @@ const makeFakeAccount = (): AccountModel => ({
   id: 'any_id',
   name: 'any_name',
   email: 'any_email@mail.com',
-  password: 'hashed_password'
+  password: 'hashed_password',
+  brithday: '1990-01-01',
+  country: 'any_country',
+  city: 'any_city',
+  state: 'any_state'
 })
 
 const makeEncrypter = (): Encrypter => {

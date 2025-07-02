@@ -31,7 +31,11 @@ describe('Auth Routes', () => {
           name: 'Jean Santana',
           email: 'jeancss01@gmail.com',
           password: '123',
-          passwordConfirmation: '123'
+          passwordConfirmation: '123',
+          brithday: '1990-01-01',
+          country: 'Brazil',
+          city: 'São Paulo',
+          state: 'SP'
         })
         .expect(200)
     })

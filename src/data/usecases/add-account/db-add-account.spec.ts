@@ -27,13 +27,21 @@ const makeFakeAccount = (): AccountModel => ({
   id: 'valid_id',
   name: 'valid_name',
   email: 'valid_email',
-  password: 'hashed_password'
+  password: 'hashed_password',
+  brithday: '1990-01-01',
+  country: 'valid_country',
+  city: 'valid_city',
+  state: 'valid_state'
 })
 
 const makeFakeAccountData = (): AddAccountModel => ({
   name: 'any_name',
   email: 'any@email.com',
-  password: 'valid_password'
+  password: 'valid_password',
+  brithday: '1990-01-01',
+  country: 'valid_country',
+  city: 'valid_city',
+  state: 'valid_state'
 })
 
 interface SutTypes {
@@ -75,7 +83,11 @@ describe('DbAddAccount Usecase', () => {
     expect(addSpy).toHaveBeenCalledWith({
       name: 'any_name',
       email: 'any@email.com',
-      password: 'hashed_password'
+      password: 'hashed_password',
+      brithday: '1990-01-01',
+      country: 'valid_country',
+      city: 'valid_city',
+      state: 'valid_state'
     })
   })
 
