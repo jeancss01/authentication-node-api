@@ -11,7 +11,6 @@ export const adapterRoute = (controller: Controller) => {
     const httpResponse = await controller.handle(httpRequest)
 
     if (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300) {
-      console.log(`Response: ${httpResponse.body.isRedirect}`)
       if (httpResponse.body.isRedirect) {
         console.log(`Redirecting to: ${httpResponse.body.redirectForUri}`)
         res.set('Content-Type', 'text/html')
