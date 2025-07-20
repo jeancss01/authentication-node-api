@@ -37,14 +37,16 @@ export class LoginController implements Controller {
         accountId,
         codeChallenge,
         codeChallengeMethod,
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes expiration
+        expiresAt: new Date(Date.now() + 100 * 1000), // 100 seconds expiration
         createdAt: new Date()
       })
+      console.log('Login - codeChallenge salvo:', codeChallenge)
+      console.log('Login - Token gerado:', code)
 
       return ok({
         code: authCode.code,
         redirect_uri: `${redirectUri}?code=${authCode.code}`,
-        expires_in: 900 // 15 minutos
+        expiresIn: 100 // 100 seconds
       })
     } catch (error) {
       return serverError(error as Error)

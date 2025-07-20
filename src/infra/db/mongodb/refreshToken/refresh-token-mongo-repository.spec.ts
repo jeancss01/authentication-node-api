@@ -52,4 +52,20 @@ describe('RefreshTokenMongoRepository', () => {
     expect(refreshToken.token).toBe('any_token')
     expect(refreshToken.expiresAt).toBeInstanceOf(Date)
   })
+
+  test('Should return a refresh token on load success', async () => {
+    const sut = makeSut()
+    await sut.add({
+      token: 'any_token',
+      accountId: 'any_account_id',
+      clientId: 'any_client_id',
+      expiresAt: new Date(Date.now() + 3600000) // 1 hour from now
+    })
+    const refreshToken = await sut.load('any_token')
+    expect(refreshToken).toBeTruthy()
+    expect(refreshToken?.token).toBe('any_token')
+    expect(refreshToken?.accountId).toBe('any_account_id')
+    expect(refreshToken?.clientId).toBe('any_client_id')
+    expect(refreshToken?.expiresAt).toBeInstanceOf(Date)
+  })
 })

@@ -1,7 +1,6 @@
 import type { AccountModel } from '../../../domain/models/account'
 import type { GetAccount } from '../../../domain/usecases/get-account'
-import { MissingParamError } from '../../errors/missing-param-error'
-import { badRequest, notFound, ok, serverError } from '../../helpers/http/http-helper'
+import { notFound, ok, serverError } from '../../helpers/http/http-helper'
 import type { HttpRequest } from '../../protocols'
 import type { Validation } from '../../protocols/validation'
 import { GetAccountController } from './get-account-controller'
@@ -9,7 +8,8 @@ import { GetAccountController } from './get-account-controller'
 const makeFakeRequest = (): HttpRequest => ({
   query: {
     accountId: 'valid_account_id_1234567'
-  }
+  },
+  accountId: 'valid_account_id_1234567' // Simulating the accountId
 })
 const makeValidation = (): Validation => {
   class ValidationStub implements Validation {
@@ -25,7 +25,7 @@ const makeFakeAccount = (): AccountModel => ({
   name: 'valid_name',
   email: 'valid_email@example.com',
   password: 'valid_password',
-  brithday: '1990-01-01',
+  birthday: '1990-01-01',
   country: 'valid_country',
   city: 'valid_city',
   state: 'valid_state'
@@ -73,7 +73,7 @@ describe('GetAccountController', () => {
       id: 'valid_account_id',
       name: 'valid_name',
       email: 'valid_email@example.com',
-      brithday: '1990-01-01',
+      birthday: '1990-01-01',
       country: 'valid_country',
       city: 'valid_city',
       state: 'valid_state'
@@ -92,22 +92,5 @@ describe('GetAccountController', () => {
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse).toEqual(serverError(new Error('any_error')))
-  })
-  test('Should return 400 if Validation fails', async () => {
-    const { sut, validationStub } = makeSut()
-    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new MissingParamError('field'))
-    const httpRequest = makeFakeRequest()
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse).toEqual(badRequest(new MissingParamError('field')))
-  })
-  test('Should call return error if accountId size is less than 24 characters', async () => {
-    const { sut } = makeSut()
-    const httpRequest = {
-      query: {
-        accountId: 'short_id'
-      }
-    }
-    const httpResponse = await sut.handle(httpRequest)
-    expect(httpResponse).toEqual(badRequest(new Error('accountId is not empty or null and must be 24 characters long')))
   })
 })

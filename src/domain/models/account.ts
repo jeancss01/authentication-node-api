@@ -2,7 +2,7 @@ export interface AccountModel {
   id: string
   name: string
   email: string
-  brithday: string
+  birthday: string
   password: string
   country: string
   city: string

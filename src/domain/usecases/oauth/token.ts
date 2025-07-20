@@ -6,7 +6,6 @@ export interface OauthTokenModel {
   code: string
   clientId: string
   clientSecret: string
-  redirectUri: string
   codeVerifier: string
   grantType: string
   refreshToken?: string

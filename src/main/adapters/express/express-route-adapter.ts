@@ -5,7 +5,8 @@ export const adapterRoute = (controller: Controller) => {
   return async (req: Request, res: Response) => {
     const httpRequest: HttpRequest = {
       body: req.body,
-      query: req.query
+      query: req.query,
+      accountId: req.accountId // Assuming accountId is set by a middleware
     }
 
     const httpResponse = await controller.handle(httpRequest)

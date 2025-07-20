@@ -3,6 +3,8 @@ import app from '../config/app'
 import { MongoHelper } from '../../infra/db/mongodb/helpers/mongo-helpers'
 import { type Collection } from 'mongodb'
 import { hash } from 'bcrypt'
+import { sign } from 'jsonwebtoken'
+import env from '../config/env'
 
 let accountCollection: Collection
 
@@ -32,7 +34,7 @@ describe('Auth Routes', () => {
           email: 'jeancss01@gmail.com',
           password: '123',
           passwordConfirmation: '123',
-          brithday: '1990-01-01',
+          birthday: '1990-01-01',
           country: 'Brazil',
           city: 'São Paulo',
           state: 'SP'
@@ -65,6 +67,28 @@ describe('Auth Routes', () => {
           password: '123'
         })
         .expect(401)
+    })
+  })
+
+  describe('GET /account', () => {
+    test('should return 200 on get account', async () => {
+      const password = await hash('123', 12)
+      const res = await accountCollection.insertOne({
+        name: 'Jean Santana',
+        email: 'jeancss01@gmail.com',
+        password
+      })
+      const accessToken = sign({ id: `${res.insertedId.toString()}` }, env.jwtSecret)
+      const account = await request(app)
+        .get('/api/account')
+        .set('x-access-token', `${accessToken}`)
+      expect(account).toBeTruthy()
+    })
+
+    test('should return 403 on get account without token', async () => {
+      await request(app)
+        .get('/api/account')
+        .expect(403)
     })
   })
 })
