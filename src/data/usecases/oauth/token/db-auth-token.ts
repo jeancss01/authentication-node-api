@@ -26,10 +26,12 @@ export class DbAuthToken implements OauthToken {
       // Check if the client exists and the client secret matches
       // If the client is not found or the secret does not match, return null
       if (!client) {
+        console.log('Client not found')
         return null // Client not found or invalid secret, return null
       }
       // Handle authorization code grant type
       if (!authorization.code) {
+        console.log('Authorization code is required for authorization_code grant type')
         return null // Code is required for authorization_code grant type
       }
 
@@ -38,25 +40,29 @@ export class DbAuthToken implements OauthToken {
       // If the code is expired or not found, return null
       const authCode = await this.loadAuthCodeRepository.load(authorization.code, authorization.clientId)
       if (!authCode || authCode.expiresAt < new Date()) {
+        console.log('Authorization code not found or invalid')
         return null // Auth code not found or invalid, return null
       }
       // Check if PKCE is used
       if (authCode.codeChallenge) {
-        // console.log('PKCE codeChallenge salvo na base:', authCode.codeChallenge)
-        // console.log('PKCE recebido codeVerifier:', authorization.codeVerifier)
+        console.log('PKCE codeChallenge salvo na base:', authCode.codeChallenge)
+        console.log('PKCE recebido codeVerifier:', authorization.codeVerifier)
         const hash = await this.hasher.createHash(authorization.codeVerifier)
         const codeChallenge = hash.toString()
-        // console.log('PKCE codeChallenge gerado no backend:', codeChallenge)
+        console.log('PKCE codeChallenge gerado no backend:', codeChallenge)
         if (authCode.codeChallenge !== codeChallenge) {
+          console.log('PKCE code challenge mismatch')
           return null // Code challenge mismatch, return null PKCE Invalid
         }
       } else if (client.clientSecret !== authorization.clientSecret) {
+        console.log('Client secret mismatch')
         // If PKCE is not used, check if the client secret matches
         return null // Client secret mismatch, return null
       }
       // Check if code challenge method is supported
       // Currently, only S256 is supported as per OAuth 2.0 PKCE specification
       if (authCode.codeChallengeMethod && authCode.codeChallengeMethod !== 'S256') {
+        console.log('Unsupported code challenge method:', authCode.codeChallengeMethod)
         return null // Unsupported code challenge method, return null
       }
       // Generate access token and refresh token
