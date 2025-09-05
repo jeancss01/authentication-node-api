@@ -9,4 +9,5 @@ export interface HttpRequest {
   params?: any
   query?: any
   headers?: any
+  accountId?: string // Optional, used for authenticated requests
 }

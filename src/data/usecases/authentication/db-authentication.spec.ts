@@ -13,7 +13,7 @@ const makeFakeAccount = (): AccountModel => ({
   name: 'any_name',
   email: 'any_email@mail.com',
   password: 'hashed_password',
-  brithday: '1990-01-01',
+  birthday: '1990-01-01',
   country: 'any_country',
   city: 'any_city',
   state: 'any_state'
@@ -134,7 +134,7 @@ describe('DbAuthentication UseCase', () => {
     const { sut, encrypterStub } = makeSut()
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
     await sut.auth(makeFakeAuthenticationModel())
-    expect(encryptSpy).toHaveBeenCalledWith('any_id')
+    expect(encryptSpy).toHaveBeenCalledWith('any_id', 3600)
   })
 
   test('Should throw if Encrypter throws', async () => {

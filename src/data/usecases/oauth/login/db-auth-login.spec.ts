@@ -18,7 +18,7 @@ const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
           name: 'any_name',
           email: 'any_email',
           password: 'hashed_password',
-          brithday: '1990-01-01',
+          birthday: '1990-01-01',
           country: 'any_country',
           city: 'any_city',
           state: 'any_state'

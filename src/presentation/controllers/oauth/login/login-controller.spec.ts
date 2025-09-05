@@ -43,7 +43,7 @@ const makeAddAuthCode = (): AddAuthCode => {
         accountId: input.accountId,
         codeChallenge: input.codeChallenge,
         codeChallengeMethod: input.codeChallengeMethod,
-        expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes expiration
+        expiresAt: new Date(Date.now() + 100 * 1000), // 100 seconds expiration
         createdAt: new Date()
       }
     }
@@ -110,7 +110,7 @@ describe('LoginController', () => {
     expect(httpResponse).toEqual(ok({
       code: 'hashed_code',
       redirect_uri: 'any_redirect_uri?code=hashed_code',
-      expires_in: 900 // 15 minutes
+      expiresIn: 100 // 100 seconds
     }))
     expect(addSpy).toHaveBeenCalledWith({
       code: 'hashed_code',

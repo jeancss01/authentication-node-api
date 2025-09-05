@@ -1,0 +1,1432 @@
+{
+	"info": {
+		"_postman_id": "29c3f120-d902-4faf-bd89-f134ba454182",
+		"name": "Authentication-node-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17301547"
+	},
+	"item": [
+		{
+			"name": "Oauth2 - 0 - Sucesso",
+			"item": [
+				{
+					"name": "0.0 - Authorize",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Tamanho recomendado para o code_verifier (entre 43 e 128 caracteres)",
+									"function generateCodeVerifier(length = 64) {",
+									"    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';",
+									"    let result = '';",
+									"    for (let i = 0; i < length; i++) {",
+									"        result += chars.charAt(Math.floor(Math.random() * chars.length));",
+									"    }",
+									"    return result;",
+									"}",
+									"",
+									"// Gera o code_challenge a partir do code_verifier usando SHA-256 e base64url",
+									"function base64urlencode(arrayBuffer) {",
+									"    let binary = '';",
+									"    const bytes = new Uint8Array(arrayBuffer);",
+									"    for (let i = 0; i < bytes.byteLength; i++) {",
+									"        binary += String.fromCharCode(bytes[i]);",
+									"    }",
+									"    return btoa(binary)",
+									"        .replace(/\\+/g, '-')",
+									"        .replace(/\\//g, '_')",
+									"        .replace(/=+$/, '');",
+									"}",
+									"",
+									"async function generateCodeChallenge(codeVerifier) {",
+									"    const encoder = new TextEncoder();",
+									"    const data = encoder.encode(codeVerifier);",
+									"    const digest = await crypto.subtle.digest('SHA-256', data);",
+									"    return base64urlencode(digest);",
+									"}",
+									"",
+									"// Executa e salva nas variáveis do Postman",
+									"(async () => {",
+									"    const codeVerifier = generateCodeVerifier();",
+									"    const codeChallenge = await generateCodeChallenge(codeVerifier);",
+									"    pm.collectionVariables.set('codeVerifier', codeVerifier);",
+									"    pm.collectionVariables.set('codeChallenge', codeChallenge);",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Extrair o código de autorização do redirect",
+									"const responseBody = pm.response.text();",
+									"if (responseBody.includes('redirect_uri=br.com.tcc.oauth2app://local')) {",
+									"    const match = responseBody.match(/code_challenge=([^&\"]+)/);",
+									"    if (match && match[1]) {",
+									"        pm.collectionVariables.set('authCode', match[1]);",
+									"        console.log('Authorization Code:', match[1]);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Authorization request successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/authorize?clientId={{clientId}}&redirectUri={{redirectUri}}&codeChallenge={{codeChallenge}}&codeChallengeMethod=S256",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "{{clientId}}"
+								},
+								{
+									"key": "redirectUri",
+									"value": "{{redirectUri}}"
+								},
+								{
+									"key": "codeChallenge",
+									"value": "{{codeChallenge}}"
+								},
+								{
+									"key": "codeChallengeMethod",
+									"value": "S256"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "0.1 - Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('code');",
+									"    pm.collectionVariables.set('token', response.code);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"redirectUri\": \"{{redirectUri}}\",\n    \"codeChallenge\": \"{{codeChallenge}}\",\n    \"codeChallengeMethod\": \"{{codeChallengeMethod}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/login",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "0.2 - Token - authorization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Token exchange successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('accessToken');",
+									"    pm.collectionVariables.set('accessToken', response.accessToken);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"{{token}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"codeVerifier\": \"{{codeVerifier}}\",\n    \"grantType\": \"authorization_code\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/token",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "0.3 - Token - refresh",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"a0044418c5e255c911e35c19a6c0fd78c461d35f1b60374f71513802af79a22d\",\n    \"grantType\": \"refresh_token\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/token",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Oauth2 - 1 - Falha codeVerifier",
+			"item": [
+				{
+					"name": "1.0 - Authorize",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Tamanho recomendado para o code_verifier (entre 43 e 128 caracteres)",
+									"function generateCodeVerifier(length = 64) {",
+									"    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';",
+									"    let result = '';",
+									"    for (let i = 0; i < length; i++) {",
+									"        result += chars.charAt(Math.floor(Math.random() * chars.length));",
+									"    }",
+									"    return result;",
+									"}",
+									"",
+									"// Gera o code_challenge a partir do code_verifier usando SHA-256 e base64url",
+									"function base64urlencode(arrayBuffer) {",
+									"    let binary = '';",
+									"    const bytes = new Uint8Array(arrayBuffer);",
+									"    for (let i = 0; i < bytes.byteLength; i++) {",
+									"        binary += String.fromCharCode(bytes[i]);",
+									"    }",
+									"    return btoa(binary)",
+									"        .replace(/\\+/g, '-')",
+									"        .replace(/\\//g, '_')",
+									"        .replace(/=+$/, '');",
+									"}",
+									"",
+									"async function generateCodeChallenge(codeVerifier) {",
+									"    const encoder = new TextEncoder();",
+									"    const data = encoder.encode(codeVerifier);",
+									"    const digest = await crypto.subtle.digest('SHA-256', data);",
+									"    return base64urlencode(digest);",
+									"}",
+									"",
+									"// Executa e salva nas variáveis do Postman",
+									"(async () => {",
+									"    const codeVerifier = generateCodeVerifier();",
+									"    const codeChallenge = await generateCodeChallenge(codeVerifier);",
+									"    pm.collectionVariables.set('codeVerifier', codeVerifier);",
+									"    pm.collectionVariables.set('codeChallenge', codeChallenge);",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Extrair o código de autorização do redirect",
+									"const responseBody = pm.response.text();",
+									"if (responseBody.includes('redirect_uri=br.com.tcc.oauth2app://local')) {",
+									"    const match = responseBody.match(/code_challenge=([^&\"]+)/);",
+									"    if (match && match[1]) {",
+									"        pm.collectionVariables.set('authCode', match[1]);",
+									"        console.log('Authorization Code:', match[1]);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Authorization request successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/authorize?clientId={{clientId}}&redirectUri={{redirectUri}}&codeChallenge={{codeChallenge}}&codeChallengeMethod=S256",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "{{clientId}}"
+								},
+								{
+									"key": "redirectUri",
+									"value": "{{redirectUri}}"
+								},
+								{
+									"key": "codeChallenge",
+									"value": "{{codeChallenge}}"
+								},
+								{
+									"key": "codeChallengeMethod",
+									"value": "S256"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.1 - Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('code');",
+									"    pm.collectionVariables.set('token', response.code);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"redirectUri\": \"{{redirectUri}}\",\n    \"codeChallenge\": \"{{codeChallenge}}\",\n    \"codeChallengeMethod\": \"{{codeChallengeMethod}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/login",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.2 - Token - authorization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Server rejects request without code_verifier\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('error');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"{{token}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"codeVerifier\": \"\",\n    \"grantType\": \"authorization_code\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/token",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Oauth2 - 2 -Falha codeVerifier invalido",
+			"item": [
+				{
+					"name": "2.0 - Authorize",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Tamanho recomendado para o code_verifier (entre 43 e 128 caracteres)",
+									"function generateCodeVerifier(length = 64) {",
+									"    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';",
+									"    let result = '';",
+									"    for (let i = 0; i < length; i++) {",
+									"        result += chars.charAt(Math.floor(Math.random() * chars.length));",
+									"    }",
+									"    return result;",
+									"}",
+									"",
+									"// Gera o code_challenge a partir do code_verifier usando SHA-256 e base64url",
+									"function base64urlencode(arrayBuffer) {",
+									"    let binary = '';",
+									"    const bytes = new Uint8Array(arrayBuffer);",
+									"    for (let i = 0; i < bytes.byteLength; i++) {",
+									"        binary += String.fromCharCode(bytes[i]);",
+									"    }",
+									"    return btoa(binary)",
+									"        .replace(/\\+/g, '-')",
+									"        .replace(/\\//g, '_')",
+									"        .replace(/=+$/, '');",
+									"}",
+									"",
+									"async function generateCodeChallenge(codeVerifier) {",
+									"    const encoder = new TextEncoder();",
+									"    const data = encoder.encode(codeVerifier);",
+									"    const digest = await crypto.subtle.digest('SHA-256', data);",
+									"    return base64urlencode(digest);",
+									"}",
+									"",
+									"// Executa e salva nas variáveis do Postman",
+									"(async () => {",
+									"    const codeVerifier = generateCodeVerifier();",
+									"    const codeChallenge = await generateCodeChallenge(codeVerifier);",
+									"    pm.collectionVariables.set('codeVerifier', codeVerifier);",
+									"    pm.collectionVariables.set('codeChallenge', codeChallenge);",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Extrair o código de autorização do redirect",
+									"const responseBody = pm.response.text();",
+									"if (responseBody.includes('redirect_uri=br.com.tcc.oauth2app://local')) {",
+									"    const match = responseBody.match(/code_challenge=([^&\"]+)/);",
+									"    if (match && match[1]) {",
+									"        pm.collectionVariables.set('authCode', match[1]);",
+									"        console.log('Authorization Code:', match[1]);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Authorization request successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/authorize?clientId={{clientId}}&redirectUri={{redirectUri}}&codeChallenge={{codeChallenge}}&codeChallengeMethod=S256",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "{{clientId}}"
+								},
+								{
+									"key": "redirectUri",
+									"value": "{{redirectUri}}"
+								},
+								{
+									"key": "codeChallenge",
+									"value": "{{codeChallenge}}"
+								},
+								{
+									"key": "codeChallengeMethod",
+									"value": "S256"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2.1 - Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('code');",
+									"    pm.collectionVariables.set('token', response.code);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"redirectUri\": \"{{redirectUri}}\",\n    \"codeChallenge\": \"{{codeChallenge}}\",\n    \"codeChallengeMethod\": \"{{codeChallengeMethod}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/login",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2.2 - Token - authorization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Server rejects request with incorrect code_verifier\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('error');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"{{token}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"codeVerifier\": \"12345678910\",\n    \"grantType\": \"authorization_code\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/token",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Oauth2 - 3 - Falha reutilização de código",
+			"item": [
+				{
+					"name": "3.0 - Authorize",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Tamanho recomendado para o code_verifier (entre 43 e 128 caracteres)",
+									"function generateCodeVerifier(length = 64) {",
+									"    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';",
+									"    let result = '';",
+									"    for (let i = 0; i < length; i++) {",
+									"        result += chars.charAt(Math.floor(Math.random() * chars.length));",
+									"    }",
+									"    return result;",
+									"}",
+									"",
+									"// Gera o code_challenge a partir do code_verifier usando SHA-256 e base64url",
+									"function base64urlencode(arrayBuffer) {",
+									"    let binary = '';",
+									"    const bytes = new Uint8Array(arrayBuffer);",
+									"    for (let i = 0; i < bytes.byteLength; i++) {",
+									"        binary += String.fromCharCode(bytes[i]);",
+									"    }",
+									"    return btoa(binary)",
+									"        .replace(/\\+/g, '-')",
+									"        .replace(/\\//g, '_')",
+									"        .replace(/=+$/, '');",
+									"}",
+									"",
+									"async function generateCodeChallenge(codeVerifier) {",
+									"    const encoder = new TextEncoder();",
+									"    const data = encoder.encode(codeVerifier);",
+									"    const digest = await crypto.subtle.digest('SHA-256', data);",
+									"    return base64urlencode(digest);",
+									"}",
+									"",
+									"// Executa e salva nas variáveis do Postman",
+									"(async () => {",
+									"    const codeVerifier = generateCodeVerifier();",
+									"    const codeChallenge = await generateCodeChallenge(codeVerifier);",
+									"    pm.collectionVariables.set('codeVerifier', codeVerifier);",
+									"    pm.collectionVariables.set('codeChallenge', codeChallenge);",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Extrair o código de autorização do redirect",
+									"const responseBody = pm.response.text();",
+									"if (responseBody.includes('redirect_uri=br.com.tcc.oauth2app://local')) {",
+									"    const match = responseBody.match(/code_challenge=([^&\"]+)/);",
+									"    if (match && match[1]) {",
+									"        pm.collectionVariables.set('authCode', match[1]);",
+									"        console.log('Authorization Code:', match[1]);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Authorization request successful\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/authorize?clientId={{clientId}}&redirectUri={{redirectUri}}&codeChallenge={{codeChallenge}}&codeChallengeMethod=S256",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "{{clientId}}"
+								},
+								{
+									"key": "redirectUri",
+									"value": "{{redirectUri}}"
+								},
+								{
+									"key": "codeChallenge",
+									"value": "{{codeChallenge}}"
+								},
+								{
+									"key": "codeChallengeMethod",
+									"value": "S256"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.1 - Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('code');",
+									"    pm.collectionVariables.set('token', response.code);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"redirectUri\": \"{{redirectUri}}\",\n    \"codeChallenge\": \"{{codeChallenge}}\",\n    \"codeChallengeMethod\": \"{{codeChallengeMethod}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/login",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.2 - Token - authorization success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Token exchange successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('accessToken');",
+									"    pm.collectionVariables.set('accessToken', response.accessToken);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"{{token}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"codeVerifier\": \"{{codeVerifier}}\",\n    \"grantType\": \"authorization_code\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/token",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.3 - Token - authorization error",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Server rejects reused authorization code\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('error');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"{{token}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"codeVerifier\": \"{{codeVerifier}}\",\n    \"grantType\": \"authorization_code\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/token",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Oauth2 - 4 - Falha clientId invalid",
+			"item": [
+				{
+					"name": "4.0 - Authorize",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Tamanho recomendado para o code_verifier (entre 43 e 128 caracteres)",
+									"function generateCodeVerifier(length = 64) {",
+									"    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';",
+									"    let result = '';",
+									"    for (let i = 0; i < length; i++) {",
+									"        result += chars.charAt(Math.floor(Math.random() * chars.length));",
+									"    }",
+									"    return result;",
+									"}",
+									"",
+									"// Gera o code_challenge a partir do code_verifier usando SHA-256 e base64url",
+									"function base64urlencode(arrayBuffer) {",
+									"    let binary = '';",
+									"    const bytes = new Uint8Array(arrayBuffer);",
+									"    for (let i = 0; i < bytes.byteLength; i++) {",
+									"        binary += String.fromCharCode(bytes[i]);",
+									"    }",
+									"    return btoa(binary)",
+									"        .replace(/\\+/g, '-')",
+									"        .replace(/\\//g, '_')",
+									"        .replace(/=+$/, '');",
+									"}",
+									"",
+									"async function generateCodeChallenge(codeVerifier) {",
+									"    const encoder = new TextEncoder();",
+									"    const data = encoder.encode(codeVerifier);",
+									"    const digest = await crypto.subtle.digest('SHA-256', data);",
+									"    return base64urlencode(digest);",
+									"}",
+									"",
+									"// Executa e salva nas variáveis do Postman",
+									"(async () => {",
+									"    const codeVerifier = generateCodeVerifier();",
+									"    const codeChallenge = await generateCodeChallenge(codeVerifier);",
+									"    pm.collectionVariables.set('codeVerifier', codeVerifier);",
+									"    pm.collectionVariables.set('codeChallenge', codeChallenge);",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Extrair o código de autorização do redirect",
+									"const responseBody = pm.response.text();",
+									"if (responseBody.includes('redirect_uri=br.com.tcc.oauth2app://local')) {",
+									"    const match = responseBody.match(/code_challenge=([^&\"]+)/);",
+									"    if (match && match[1]) {",
+									"        pm.collectionVariables.set('authCode', match[1]);",
+									"        console.log('Authorization Code:', match[1]);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Request error clientId invalid\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/authorize?clientId=teste&redirectUri={{redirectUri}}&codeChallenge={{codeChallenge}}&codeChallengeMethod=S256",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "teste"
+								},
+								{
+									"key": "redirectUri",
+									"value": "{{redirectUri}}"
+								},
+								{
+									"key": "codeChallenge",
+									"value": "{{codeChallenge}}"
+								},
+								{
+									"key": "codeChallengeMethod",
+									"value": "S256"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Oauth2 - 5 - Falha clientId invalid Copy",
+			"item": [
+				{
+					"name": "5.0 - Authorize",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Tamanho recomendado para o code_verifier (entre 43 e 128 caracteres)",
+									"function generateCodeVerifier(length = 64) {",
+									"    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';",
+									"    let result = '';",
+									"    for (let i = 0; i < length; i++) {",
+									"        result += chars.charAt(Math.floor(Math.random() * chars.length));",
+									"    }",
+									"    return result;",
+									"}",
+									"",
+									"// Gera o code_challenge a partir do code_verifier usando SHA-256 e base64url",
+									"function base64urlencode(arrayBuffer) {",
+									"    let binary = '';",
+									"    const bytes = new Uint8Array(arrayBuffer);",
+									"    for (let i = 0; i < bytes.byteLength; i++) {",
+									"        binary += String.fromCharCode(bytes[i]);",
+									"    }",
+									"    return btoa(binary)",
+									"        .replace(/\\+/g, '-')",
+									"        .replace(/\\//g, '_')",
+									"        .replace(/=+$/, '');",
+									"}",
+									"",
+									"async function generateCodeChallenge(codeVerifier) {",
+									"    const encoder = new TextEncoder();",
+									"    const data = encoder.encode(codeVerifier);",
+									"    const digest = await crypto.subtle.digest('SHA-256', data);",
+									"    return base64urlencode(digest);",
+									"}",
+									"",
+									"// Executa e salva nas variáveis do Postman",
+									"(async () => {",
+									"    const codeVerifier = generateCodeVerifier();",
+									"    const codeChallenge = await generateCodeChallenge(codeVerifier);",
+									"    pm.collectionVariables.set('codeVerifier', codeVerifier);",
+									"    pm.collectionVariables.set('codeChallenge', codeChallenge);",
+									"})();"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Extrair o código de autorização do redirect",
+									"const responseBody = pm.response.text();",
+									"if (responseBody.includes('redirect_uri=br.com.tcc.oauth2app://local')) {",
+									"    const match = responseBody.match(/code_challenge=([^&\"]+)/);",
+									"    if (match && match[1]) {",
+									"        pm.collectionVariables.set('authCode', match[1]);",
+									"        console.log('Authorization Code:', match[1]);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"Request error clientId invalid\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/authorize?clientId={{clientId}}&redirectUri={{redirectUri}}&codeChallenge={{codeChallenge}}&codeChallengeMethod=plain",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "{{clientId}}"
+								},
+								{
+									"key": "redirectUri",
+									"value": "{{redirectUri}}"
+								},
+								{
+									"key": "codeChallenge",
+									"value": "{{codeChallenge}}"
+								},
+								{
+									"key": "codeChallengeMethod",
+									"value": "plain"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5.1 - Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login successful\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('code');",
+									"    pm.collectionVariables.set('token', response.code);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{email}}\",\n    \"password\": \"{{password}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"redirectUri\": \"{{redirectUri}}\",\n    \"codeChallenge\": \"{{codeChallenge}}\",\n    \"codeChallengeMethod\": \"plain\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/login",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5.2 - Token - authorization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Server rejects reused codeChallengeMethod invalid\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('error');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"{{token}}\",\n    \"clientId\": \"{{clientId}}\",\n    \"codeVerifier\": \"{{codeVerifier}}\",\n    \"grantType\": \"authorization_code\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:5050/api/oauth/token",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "5050",
+							"path": [
+								"api",
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Jean Santana\",\n    \"email\": \"jeancss01@gmail.com\",\n    \"password\": \"teste123\",\n    \"passwordConfirmation\": \"teste123\",\n    \"brithday\": \"1990-01-01\",\n    \"country\": \"Brazil\",\n    \"city\": \"São Paulo\",\n    \"state\": \"SP\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5050/api/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5050",
+					"path": [
+						"api",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"jeancss01@gmail.com\",\n    \"password\": \"teste123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5050/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5050",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "account",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjVhNDY2ODk2YWQ3NmE1OWI1NjM5ZiIsImlhdCI6MTc1MzA0OTQ3OSwiZXhwIjoxNzUzMDQ5NTc5fQ.PirXjCqFwlW-UKRvCqR73xIW37aD0Wj6PugsxlrNTD4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4NjVhNDY2ODk2YWQ3NmE1OWI1NjM5ZiIsImlhdCI6MTc1Mjg2NTc3NywiZXhwIjoxNzUyODY2Njc3fQ.KzGY1KAmItTON6bssdKPVv18qup-nOUuqCYgQlb_I1w",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "accountId",
+							"value": "6865a466896ad76a59b5639f",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://0.0.0.0:5050/api/account",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "5050",
+					"path": [
+						"api",
+						"account"
+					],
+					"query": [
+						{
+							"key": "accountId",
+							"value": "6865a466896ad76a59b5639f",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "codeVerifier",
+			"value": ""
+		},
+		{
+			"key": "codeChallenge",
+			"value": ""
+		},
+		{
+			"key": "authCode",
+			"value": ""
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		}
+	]
+}

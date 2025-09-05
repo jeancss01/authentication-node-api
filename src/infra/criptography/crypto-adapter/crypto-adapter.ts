@@ -7,6 +7,10 @@ export class CryptoAdapter implements Hasher {
   }
 
   async createHash (value: string): Promise<string> {
-    return crypto.createHash('sha256').update(value).digest('hex')
+    const hash = crypto.createHash('sha256').update(value).digest('base64')
+    return hash
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=/g, '')
   }
 }

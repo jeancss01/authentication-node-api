@@ -6,7 +6,7 @@ describe('TokenValidation Factory', () => {
   test('should call ValidationComposite with all validations', () => {
     makeTokenValidation()
     const validations: any[] = []
-    for (const field of ['clientId', 'redirectUri', 'codeVerifier', 'grantType', 'scope', 'code']) {
+    for (const field of ['grantType']) {
       validations.push(new RequiredFieldValidation(field))
     }
     expect(ValidationComposite).toHaveBeenCalledTimes(1)

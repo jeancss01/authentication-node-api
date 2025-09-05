@@ -27,7 +27,7 @@ const makeFakeAccount = (): AccountModel => ({
   name: 'valid_name',
   email: 'valid@email.com',
   password: 'valid_password',
-  brithday: '1990-01-01',
+  birthday: '1990-01-01',
   country: 'valid_country',
   city: 'valid_city',
   state: 'valid_state'

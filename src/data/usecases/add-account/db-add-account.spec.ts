@@ -28,7 +28,7 @@ const makeFakeAccount = (): AccountModel => ({
   name: 'valid_name',
   email: 'valid_email',
   password: 'hashed_password',
-  brithday: '1990-01-01',
+  birthday: '1990-01-01',
   country: 'valid_country',
   city: 'valid_city',
   state: 'valid_state'
@@ -38,7 +38,7 @@ const makeFakeAccountData = (): AddAccountModel => ({
   name: 'any_name',
   email: 'any@email.com',
   password: 'valid_password',
-  brithday: '1990-01-01',
+  birthday: '1990-01-01',
   country: 'valid_country',
   city: 'valid_city',
   state: 'valid_state'
@@ -84,7 +84,7 @@ describe('DbAddAccount Usecase', () => {
       name: 'any_name',
       email: 'any@email.com',
       password: 'hashed_password',
-      brithday: '1990-01-01',
+      birthday: '1990-01-01',
       country: 'valid_country',
       city: 'valid_city',
       state: 'valid_state'

@@ -15,17 +15,16 @@ export class TokenController implements Controller {
       if (error) {
         return badRequest(error)
       }
-      const { code, clientId, clientSecret, redirectUri, codeVerifier, grantType, refreshToken, scope } = httpRequest.body
+      const { code, clientId, clientSecret, codeVerifier, grantType, refreshToken } = httpRequest.body
       const tokenResponse = await this.authToken.token({
         code,
         clientId,
         clientSecret,
-        redirectUri,
         codeVerifier,
         grantType,
-        refreshToken,
-        scope
+        refreshToken
       })
+      console.log('TokenController - tokenResponse:', tokenResponse)
       if (!tokenResponse) {
         return unauthorized()
       }
