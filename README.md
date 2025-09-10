@@ -2,6 +2,9 @@
 
 API de autenticação moderna baseada em Node.js, TypeScript e Express, com suporte a OAuth 2.0 + PKCE, arquitetura em camadas (Clean Architecture) e testes automatizados.
 
+[![Build Status](https://travis-ci.com/seu-usuario/authentication-node-api.svg?branch=main)](https://travis-ci.com/seu-usuario/authentication-node-api)
+[![Coverage Status](https://coveralls.io/repos/github/seu-usuario/authentication-node-api/badge.svg?branch=main)](https://coveralls.io/github/seu-usuario/authentication-node-api?branch=main)
+
 ## 🚀 Funcionalidades
 
 - Cadastro e autenticação de usuários
