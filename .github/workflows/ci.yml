@@ -12,12 +12,12 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x] # Mudou de 18.x para 20.x
+        node-version: [20.x]
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Necessário para o SonarCloud
+          fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -38,6 +38,18 @@ jobs:
 
       - name: Run tests with coverage
         run: npm run test:ci
+
+      # Debug: verificar se o arquivo foi gerado
+      - name: Check coverage files
+        run: |
+          ls -la coverage/
+          cat coverage/lcov.info | head -20
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Send coverage to Coveralls
         uses: coverallsapp/github-action@v2
