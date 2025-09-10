@@ -1,6 +1,6 @@
 # Authentication Node API
 
-API de autenticação moderna baseada em Node.js, TypeScript e Express, com suporte a OAuth 2.0 + PKCE, arquitetura em camadas (Clean Architecture) e testes automatizados
+API de autenticação moderna baseada em Node.js, TypeScript e Express, com suporte a OAuth 2.0 + PKCE, arquitetura em camadas (Clean Architecture) e testes automatizados.
 
 ## 🚀 Funcionalidades
 
