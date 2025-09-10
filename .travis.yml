@@ -1,6 +1,7 @@
 language: node_js
 node_js:
-  - 22
+  - 18
 script:
+- npm install
 - eslint 'src/**'
 - npm run test:coveralls
