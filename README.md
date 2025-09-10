@@ -3,7 +3,10 @@
 API de autenticação moderna baseada em Node.js, TypeScript e Express, com suporte a OAuth 2.0 + PKCE, arquitetura em camadas (Clean Architecture) e testes automatizados.
 
 [![CI](https://github.com/jeancss01/authentication-node-api/actions/workflows/ci.yml/badge.svg)](https://github.com/jeancss01/authentication-node-api/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/jeancss01/authentication-node-api/badge.svg?branch=main)](https://coveralls.io/github/jeancss01/authentication-node-api?branch=main)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=coverage)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
 
 ## 🚀 Funcionalidades
 
@@ -39,7 +42,7 @@ src/
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/seu-usuario/authentication-node-api.git
+   git clone https://github.com/jeancss01/authentication-node-api.git
    cd authentication-node-api
    ```
 
