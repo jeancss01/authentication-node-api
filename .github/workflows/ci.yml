@@ -22,11 +22,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Instala dependências do sistema
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libssl1.1 || sudo apt-get install -y libssl-dev
-
       - name: Install dependencies
         run: npm install
 
@@ -34,9 +29,7 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        run: |
-          export MONGOMS_VERSION=6.0.5
-          npm run test:ci
+        run: npm run test:ci
 
       - name: Generate coverage report
         run: |
