@@ -3,6 +3,7 @@
 API de autenticação moderna baseada em Node.js, TypeScript e Express, com suporte a OAuth 2.0 + PKCE, arquitetura em camadas (Clean Architecture) e testes automatizados.
 
 [![CI](https://github.com/jeancss01/authentication-node-api/actions/workflows/ci.yml/badge.svg)](https://github.com/jeancss01/authentication-node-api/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/jeancss01/authentication-node-api/badge.svg?branch=main)](https://coveralls.io/github/jeancss01/authentication-node-api?branch=main)
 
 ## 🚀 Funcionalidades
 
