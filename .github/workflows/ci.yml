@@ -39,17 +39,21 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:ci
 
-      # Debug: verificar se o arquivo foi gerado
       - name: Check coverage files
         run: |
-          ls -la coverage/
-          cat coverage/lcov.info | head -20
+          ls -la coverage/ || echo "Coverage directory not found"
+          if [ -f coverage/lcov.info ]; then
+            echo "lcov.info found, showing first 10 lines:"
+            head -10 coverage/lcov.info
+          else
+            echo "lcov.info not found"
+          fi
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
 
       - name: Send coverage to Coveralls
         uses: coverallsapp/github-action@v2
