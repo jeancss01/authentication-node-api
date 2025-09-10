@@ -34,7 +34,9 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        run: npm run test:ci
+        run: |
+          export MONGOMS_VERSION=6.0.5
+          npm run test:ci
 
       - name: Generate coverage report
         run: |
