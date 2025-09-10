@@ -28,15 +28,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Run tests
+      - name: Run tests with coverage
         run: npm run test:ci
-
-      - name: Generate coverage report
-        run: |
-          npm run test:coveralls
 
       - name: Send coverage to Coveralls
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: ./coverage.lcov
+          path-to-lcov: ./coverage/lcov.info
