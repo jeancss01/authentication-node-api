@@ -30,14 +30,25 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
+      - name: Cache MongoDB binaries
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/mongodb-memory-server
+          key: ${{ runner.os }}-mongodb-6.0.5
+
       - name: Install dependencies
         run: npm ci
+        env:
+          MONGOMS_DOWNLOAD_URL: https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-6.0.5.tgz
+          MONGOMS_VERSION: 6.0.5
 
       - name: Lint
         run: npm run lint
 
       - name: Run tests with coverage
         run: npm run test:ci
+        env:
+          MONGOMS_VERSION: 6.0.5
 
       - name: Check coverage files
         run: |
