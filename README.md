@@ -1,6 +1,6 @@
 # Authentication Node API
 
-API de autenticação moderna baseada em Node.js, TypeScript e Express, com suporte a OAuth 2.0 + PKCE, arquitetura em camadas (Clean Architecture) e testes automatizados.
+API de autenticação moderna baseada em Node.js, TypeScript e Express, com suporte a OAuth 2.0 + PKCE, arquitetura em camadas (Clean Architecture) e testes automatizados
 
 [![CI](https://github.com/jeancss01/authentication-node-api/actions/workflows/ci.yml/badge.svg)](https://github.com/jeancss01/authentication-node-api/actions/workflows/ci.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
