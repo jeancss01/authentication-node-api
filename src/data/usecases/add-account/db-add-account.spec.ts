@@ -4,11 +4,11 @@ import { DbAddAccount } from './db-add-account'
 const makeHasher = (): Hasher => {
   class HasherStub implements Hasher {
     async createHash (value: string): Promise<string> {
-      return await new Promise(resolve => { resolve('hashed_value') })
+      return await Promise.resolve('hashed_value')
     }
 
     async hash (value: string): Promise<string> {
-      return await new Promise(resolve => { resolve('hashed_password') })
+      return await Promise.resolve('hashed_password')
     }
   }
   return new HasherStub()
@@ -17,7 +17,7 @@ const makeHasher = (): Hasher => {
 const makeAddAccountRepository = (): AddAccountRepository => {
   class AddAccountRepositoryStub implements AddAccountRepository {
     async add (addAccountModel: AddAccountModel): Promise<AccountModel> {
-      return await new Promise(resolve => { resolve(makeFakeAccount()) })
+      return await Promise.resolve(makeFakeAccount())
     }
   }
   return new AddAccountRepositoryStub()
@@ -71,7 +71,7 @@ describe('DbAddAccount Usecase', () => {
 
   test('Should throw if Hasher with throws', async () => {
     const { sut, hasherStub } = makeSut()
-    jest.spyOn(hasherStub, 'hash').mockResolvedValueOnce(new Promise((resolve, reject) => { reject(new Error()) }))
+    jest.spyOn(hasherStub, 'hash').mockResolvedValueOnce(Promise.reject(new Error()))
     const promise = sut.add(makeFakeAccountData())
     await expect(promise).rejects.toThrow()
   })
@@ -93,7 +93,7 @@ describe('DbAddAccount Usecase', () => {
 
   test('Should throw if addAccountRepository with throws', async () => {
     const { sut, addAccountRepositoryStub } = makeSut()
-    jest.spyOn(addAccountRepositoryStub, 'add').mockResolvedValueOnce(new Promise((resolve, reject) => { reject(new Error()) }))
+    jest.spyOn(addAccountRepositoryStub, 'add').mockResolvedValueOnce(Promise.reject(new Error()))
     const promise = sut.add(makeFakeAccountData())
     await expect(promise).rejects.toThrow()
   })

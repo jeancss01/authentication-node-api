@@ -22,7 +22,7 @@ const makeFakeAccount = (): AccountModel => ({
 const makeEncrypter = (): Encrypter => {
   class EncrypterStub implements Encrypter {
     async encrypt (value: string): Promise<string> {
-      return await new Promise(resolve => { resolve('any_token') })
+      return await Promise.resolve('any_token')
     }
   }
   return new EncrypterStub()
@@ -31,7 +31,7 @@ const makeEncrypter = (): Encrypter => {
 const makeHashComparer = (): HashComparer => {
   class HashComparerStub implements HashComparer {
     async compare (value: string, hash: string): Promise<boolean> {
-      return await new Promise(resolve => { resolve(true) })
+      return await Promise.resolve(true)
     }
   }
   return new HashComparerStub()
@@ -40,7 +40,7 @@ const makeHashComparer = (): HashComparer => {
 const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
     async loadByEmail (email: string): Promise<AccountModel | null> {
-      return await new Promise(resolve => { resolve(makeFakeAccount()) })
+      return await Promise.resolve(makeFakeAccount())
     }
   }
   return new LoadAccountByEmailRepositoryStub()

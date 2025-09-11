@@ -12,17 +12,15 @@ const makeFakeOauthLoginModel = (): OauthLoginModel => ({
 const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
   class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
     async loadByEmail (email: string): Promise<AccountModel | null> {
-      return await new Promise(resolve => {
-        resolve({
-          id: 'any_id',
-          name: 'any_name',
-          email: 'any_email',
-          password: 'hashed_password',
-          birthday: '1990-01-01',
-          country: 'any_country',
-          city: 'any_city',
-          state: 'any_state'
-        })
+      return await Promise.resolve({
+        id: 'any_id',
+        name: 'any_name',
+        email: 'any_email',
+        password: 'hashed_password',
+        birthday: '1990-01-01',
+        country: 'any_country',
+        city: 'any_city',
+        state: 'any_state'
       })
     }
   }
@@ -32,7 +30,7 @@ const makeLoadAccountByEmailRepository = (): LoadAccountByEmailRepository => {
 const makeHashComparer = (): HashComparer => {
   class HashComparerStub implements HashComparer {
     async compare (value: string, hash: string): Promise<boolean> {
-      return await new Promise(resolve => { resolve(true) })
+      return await Promise.resolve(true)
     }
   }
   return new HashComparerStub()

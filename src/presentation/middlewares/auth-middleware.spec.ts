@@ -33,7 +33,7 @@ const makeSut = (role?: string): SutTypes => {
 const makeLoadAccountByToken = (): LoadAccountByToken => {
   class LoadAccountByTokenStub implements LoadAccountByToken {
     async load (token: string, role?: string): Promise<AccountModel | null> {
-      return await new Promise(resolve => { resolve(makeFakeAccount()) })
+      return await Promise.resolve(makeFakeAccount())
     }
   }
   return new LoadAccountByTokenStub()

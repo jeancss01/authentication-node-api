@@ -41,7 +41,7 @@ const makeFakeAuthCodeModel = (): AuthCodeModel => ({
 const makeLoadClientByClientIdRepository = (): LoadClientByClientIdRepository => {
   class LoadClientByClientIdRepositoryStub implements LoadClientByClientIdRepository {
     async loadByClientId (clientId: string): Promise<ClientModel | null> {
-      return await new Promise(resolve => { resolve(makeFakeClient()) })
+      return await Promise.resolve(makeFakeClient())
     }
   }
   return new LoadClientByClientIdRepositoryStub()
@@ -50,7 +50,7 @@ const makeLoadClientByClientIdRepository = (): LoadClientByClientIdRepository =>
 const makeLoadAuthCodeRepository = (): LoadAuthCodeRepository => {
   class LoadAuthCodeRepositoryStub implements LoadAuthCodeRepository {
     async load (code: string, clientId: string): Promise<AuthCodeModel | null> {
-      return await new Promise(resolve => { resolve(makeFakeAuthCodeModel()) })
+      return await Promise.resolve(makeFakeAuthCodeModel())
     }
   }
   return new LoadAuthCodeRepositoryStub()
@@ -58,11 +58,11 @@ const makeLoadAuthCodeRepository = (): LoadAuthCodeRepository => {
 const makeRefreshTokenRepositoryStub = (): RefreshTokenMongoRepository => {
   class RefreshTokenRepositoryStub implements RefreshTokenMongoRepository {
     async load (token: string): Promise<RefreshTokenModel | null> {
-      throw await new Promise(resolve => { resolve(makeFakeRefreshTokenModel()) })
+      throw await Promise.resolve(makeFakeRefreshTokenModel())
     }
 
     async add (refreshTokenData: AddRefreshTokenModel): Promise<RefreshTokenModel> {
-      return await new Promise(resolve => { resolve(makeFakeRefreshTokenModel()) })
+      return await Promise.resolve(makeFakeRefreshTokenModel())
     }
   }
   return new RefreshTokenRepositoryStub()
@@ -79,11 +79,11 @@ const makeDeleteAuthCodeRepositoryStub = (): DeleteAuthCodeRepository => {
 const makeHasher = (): Hasher => {
   class HasherStub implements Hasher {
     async createHash (value: string): Promise<string> {
-      return await new Promise(resolve => { resolve('hashed_value') })
+      return await Promise.resolve('hashed_value')
     }
 
     async hash (value: string): Promise<string> {
-      return await new Promise(resolve => { resolve('hashed') })
+      return await Promise.resolve('hashed')
     }
   }
   return new HasherStub()
@@ -92,7 +92,7 @@ const makeHasher = (): Hasher => {
 const makeEncrypter = (): Encrypter => {
   class EncrypterStub implements Encrypter {
     async encrypt (value: string): Promise<string> {
-      return await new Promise(resolve => { resolve('any_token') })
+      return await Promise.resolve('any_token')
     }
   }
   return new EncrypterStub()

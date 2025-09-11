@@ -34,9 +34,7 @@ const makeFakeAccount = (): AccountModel => ({
 const makeGetAccount = (): GetAccount => {
   class GetAccountStub implements GetAccount {
     async get (accountId: string): Promise<AccountModel> {
-      return await new Promise(resolve => {
-        resolve(makeFakeAccount())
-      })
+      return await Promise.resolve(makeFakeAccount())
     }
   }
   return new GetAccountStub()

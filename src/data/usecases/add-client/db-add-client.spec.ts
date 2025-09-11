@@ -20,7 +20,7 @@ const makeFakeClientData = (): AddClientModel => ({
 const makeAddClientRepositoryStub = (): AddClientRepository => {
   class AddClientRepositoryStub implements AddClientRepository {
     async add (clientData: AddClientModel): Promise<ClientModel> {
-      return await new Promise(resolve => { resolve(makeFakeClientModel()) })
+      return await Promise.resolve(makeFakeClientModel())
     }
   }
   return new AddClientRepositoryStub()
@@ -29,7 +29,7 @@ const makeAddClientRepositoryStub = (): AddClientRepository => {
 const makeLoadClientByClientIdRepositoryStub = (): LoadClientByClientIdRepository => {
   class LoadClientByClientIdRepositoryStub implements LoadClientByClientIdRepository {
     async loadByClientId (clientId: string): Promise<ClientModel | null> {
-      return await new Promise(resolve => { resolve(null) })
+      return await Promise.resolve(null)
     }
   }
   return new LoadClientByClientIdRepositoryStub()

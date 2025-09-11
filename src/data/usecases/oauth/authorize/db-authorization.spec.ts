@@ -20,7 +20,7 @@ const makeFakeClient = (): ClientModel => ({
 const makeLoadClientByClientIdRepository = (): LoadClientByClientIdRepository => {
   class LoadClientByClientIdRepositoryStub implements LoadClientByClientIdRepository {
     async loadByClientId (clientId: string): Promise<ClientModel | null> {
-      return await new Promise(resolve => { resolve(makeFakeClient()) })
+      return await Promise.resolve(makeFakeClient())
     }
   }
   return new LoadClientByClientIdRepositoryStub()

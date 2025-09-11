@@ -15,9 +15,7 @@ const makeValidation = (): Validation => {
 const makeAuthentication = (): Authentication => {
   class AuthenticationStub {
     async auth (authentication: AuthenticationModel): Promise<string> {
-      return await new Promise(resolve => {
-        resolve('any_token')
-      })
+      return await Promise.resolve('any_token')
     }
   }
   return new AuthenticationStub()
@@ -62,7 +60,7 @@ describe('Login Controller', () => {
 
   test('Should return 401 if invalid credentials are provided', async () => {
     const { sut, authenticationStub } = makeSut()
-    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(new Promise(resolve => { resolve(null) }))
+    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(Promise.resolve(null))
 
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(unauthorized())

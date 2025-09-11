@@ -12,11 +12,6 @@ export class GetAccountController implements Controller {
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
       console.log('Account ID:', httpRequest.accountId)
-      // const error = this.validation.validate(httpRequest.query)
-      // if (error) {
-      //   return badRequest(error)
-      // }
-      // const { accountId } = httpRequest.query
       const accountId = httpRequest.accountId
       const account = await this.account.get(String(accountId))
       if (!account) {
