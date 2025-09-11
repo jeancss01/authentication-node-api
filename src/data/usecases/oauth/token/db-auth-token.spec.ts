@@ -291,6 +291,61 @@ describe('DbAuthToken UseCase', () => {
       })
       expect(response).toBeNull()
     })
+
+    test('Should return tokens when client secret is valid and PKCE is not used', async () => {
+      const { sut, loadClientByClientIdRepository, loadAuthCodeRepository, encrypter, hasher } = makeSut()
+
+      // Mock do cliente
+      jest.spyOn(loadClientByClientIdRepository, 'loadByClientId')
+        .mockReturnValueOnce(Promise.resolve(makeFakeClient()))
+
+      // Mock do auth code SEM codeChallenge (para usar client secret)
+      jest.spyOn(loadAuthCodeRepository, 'load')
+        .mockReturnValueOnce(Promise.resolve({
+          ...makeFakeAuthCodeModel(),
+          codeChallenge: '', // Sem PKCE, vai validar client secret
+          codeChallengeMethod: ''
+        }))
+
+      jest.spyOn(encrypter, 'encrypt').mockReturnValueOnce(Promise.resolve('any_access_token'))
+      jest.spyOn(hasher, 'hash').mockReturnValueOnce(Promise.resolve('any_refresh_token'))
+
+      const response = await sut.token({
+        ...makeFakeOauthTokenModel(),
+        clientSecret: 'any_client_secret', // Client secret CORRETO
+        codeVerifier: '' // Sem code verifier pois não usa PKCE
+      })
+
+      expect(response).toEqual({
+        accessToken: 'any_access_token',
+        refreshToken: 'any_refresh_token',
+        expiresIn: 100,
+        tokenType: 'Bearer'
+      })
+    })
+
+    test('Should return null when client secret is invalid and PKCE is not used', async () => {
+      const { sut, loadClientByClientIdRepository, loadAuthCodeRepository } = makeSut()
+
+      jest.spyOn(loadClientByClientIdRepository, 'loadByClientId')
+        .mockReturnValueOnce(Promise.resolve(makeFakeClient()))
+
+      // Mock do auth code SEM codeChallenge (para usar client secret)
+      jest.spyOn(loadAuthCodeRepository, 'load')
+        .mockReturnValueOnce(Promise.resolve({
+          ...makeFakeAuthCodeModel(),
+          codeChallenge: '', // Sem PKCE, vai validar client secret
+          codeChallengeMethod: ''
+        }))
+
+      const response = await sut.token({
+        ...makeFakeOauthTokenModel(),
+        clientSecret: 'invalid_client_secret', // Client secret INCORRETO
+        codeVerifier: '' // Sem code verifier pois não usa PKCE
+      })
+
+      expect(response).toBeNull()
+    })
   })
 
   describe('Refresh Token', () => {

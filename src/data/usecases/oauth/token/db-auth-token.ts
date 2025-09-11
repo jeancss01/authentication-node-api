@@ -1,3 +1,4 @@
+import type { AuthCodeModel } from '../../../../domain/models/auth-code'
 import type { OauthToken, OauthTokenModel, OauthTokenResponse } from '../../../../domain/usecases/oauth/token'
 import type { RefreshTokenMongoRepository } from '../../../../infra/db/mongodb/refreshToken/refresh-token-mongo-repository'
 import type { Hasher } from '../../../protocols/criptography/hasher'
@@ -19,104 +20,129 @@ export class DbAuthToken implements OauthToken {
   private readonly timeExpiresIn = 100 // 100 seconds for access token expiration
 
   async token (authorization: OauthTokenModel): Promise<OauthTokenResponse | null> {
-    // Check if the grant type is supported
     if (authorization.grantType === 'authorization_code') {
-      // Load the client from the repository
-      const client = await this.loadClientByClientIdRepository.loadByClientId(authorization.clientId)
-      // Check if the client exists and the client secret matches
-      // If the client is not found or the secret does not match, return null
-      if (!client) {
-        console.log('Client not found')
-        return null // Client not found or invalid secret, return null
-      }
-      // Handle authorization code grant type
-      if (!authorization.code) {
-        console.log('Authorization code is required for authorization_code grant type')
-        return null // Code is required for authorization_code grant type
-      }
+      return await this.handleAuthorizationCodeGrant(authorization)
+    }
 
-      // Load the authorization code from the repository
-      // Check if the authorization code exists and is valid
-      // If the code is expired or not found, return null
-      const authCode = await this.loadAuthCodeRepository.load(authorization.code, authorization.clientId)
-      if (!authCode || authCode.expiresAt < new Date()) {
-        console.log('Authorization code not found or invalid')
-        return null // Auth code not found or invalid, return null
-      }
-      // Check if PKCE is used
-      if (authCode.codeChallenge) {
-        console.log('PKCE codeChallenge salvo na base:', authCode.codeChallenge)
-        console.log('PKCE recebido codeVerifier:', authorization.codeVerifier)
-        const hash = await this.hasher.createHash(authorization.codeVerifier)
-        const codeChallenge = hash.toString()
-        console.log('PKCE codeChallenge gerado no backend:', codeChallenge)
-        if (authCode.codeChallenge !== codeChallenge) {
-          console.log('PKCE code challenge mismatch')
-          return null // Code challenge mismatch, return null PKCE Invalid
-        }
-      } else if (client.clientSecret !== authorization.clientSecret) {
-        console.log('Client secret mismatch')
-        // If PKCE is not used, check if the client secret matches
-        return null // Client secret mismatch, return null
-      }
-      // Check if code challenge method is supported
-      // Currently, only S256 is supported as per OAuth 2.0 PKCE specification
-      if (authCode.codeChallengeMethod && authCode.codeChallengeMethod !== 'S256') {
-        console.log('Unsupported code challenge method:', authCode.codeChallengeMethod)
-        return null // Unsupported code challenge method, return null
-      }
-      // Generate access token and refresh token
-      // Encrypt the accountId to create the access token
-      const accessToken = await this.encrypter.encrypt(authCode.accountId, this.timeExpiresIn) // Assuming 100 seconds expiration
-      const refreshToken = await this.hasher.hash('')
+    if (authorization.grantType === 'refresh_token') {
+      return await this.handleRefreshTokenGrant(authorization)
+    }
 
-      // Add the refresh token to the database
-      await this.refreshTokenMongoRepository.add({
-        token: refreshToken,
-        accountId: authCode.accountId,
-        clientId: authorization.clientId,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24) // 24 hours
-      })
-      // Delete the authorization code after successful token generation
-      await this.deleteAuthCodeRepository.delete(authCode.code, authorization.clientId)
+    return null // Unsupported grant type
+  }
 
-      // Return the token response
-      return {
-        accessToken,
-        refreshToken,
-        expiresIn: this.timeExpiresIn,
-        tokenType: 'Bearer'
-      }
-    } else if (authorization.grantType === 'refresh_token') {
-      // Handle refresh token grant type
-      if (!authorization.refreshToken) {
-        return null // Refresh token is required for refresh_token grant type
-      }
+  private async handleAuthorizationCodeGrant (authorization: OauthTokenModel): Promise<OauthTokenResponse | null> {
+    const client = await this.loadClientByClientIdRepository.loadByClientId(authorization.clientId)
+    if (!client) {
+      console.log('Client not found')
+      return null
+    }
 
-      // Load the refresh token from the repository
-      const refreshToken = await this.refreshTokenMongoRepository.load(authorization.refreshToken)
-      if (!refreshToken) {
-        return null // Refresh token not found or invalid, return null
-      }
+    if (!authorization.code) {
+      console.log('Authorization code is required for authorization_code grant type')
+      return null
+    }
 
-      // Check if the refresh token is expired
-      if (refreshToken.expiresAt < new Date()) {
-        return null // Refresh token expired, return null
-      }
+    const authCode: AuthCodeModel | null = await this.loadAuthCodeRepository.load(authorization.code, authorization.clientId)
+    if (!authCode || authCode.expiresAt < new Date()) {
+      console.log('Authorization code not found or invalid')
+      return null
+    }
 
-      // Generate a new access token
-      const accessToken = await this.encrypter.encrypt(refreshToken.accountId, this.timeExpiresIn)
+    const isAuthenticationValid = await this.validateAuthentication(authCode, client, authorization)
+    if (!isAuthenticationValid) {
+      return null
+    }
 
-      // Return the token response
-      return {
-        accessToken,
-        refreshToken: authorization.refreshToken,
-        expiresIn: this.timeExpiresIn,
-        tokenType: 'Bearer'
-      }
-    } else {
-      // Unsupported grant type
-      return null // Return null for unsupported grant types
+    if (!this.isCodeChallengeMethodSupported(authCode)) {
+      console.log('Unsupported code challenge method:', authCode.codeChallengeMethod)
+      return null
+    }
+
+    return await this.generateTokenResponse(authCode, authorization)
+  }
+
+  private async validateAuthentication (authCode: any, client: any, authorization: OauthTokenModel): Promise<boolean> {
+    if (authCode.codeChallenge) {
+      return await this.validatePKCE(authCode, authorization)
+    }
+
+    return this.validateClientSecret(client, authorization)
+  }
+
+  private async validatePKCE (authCode: any, authorization: OauthTokenModel): Promise<boolean> {
+    console.log('PKCE codeChallenge salvo na base:', authCode.codeChallenge)
+    console.log('PKCE recebido codeVerifier:', authorization.codeVerifier)
+
+    const hash = await this.hasher.createHash(authorization.codeVerifier)
+    const codeChallenge = hash.toString()
+    console.log('PKCE codeChallenge gerado no backend:', codeChallenge)
+
+    if (authCode.codeChallenge !== codeChallenge) {
+      console.log('PKCE code challenge mismatch')
+      return false
+    }
+
+    return true
+  }
+
+  private validateClientSecret (client: any, authorization: OauthTokenModel): boolean {
+    if (client.clientSecret !== authorization.clientSecret) {
+      console.log('Client secret mismatch')
+      return false
+    }
+    return true
+  }
+
+  private isCodeChallengeMethodSupported (authCode: any): boolean {
+    return !authCode.codeChallengeMethod || authCode.codeChallengeMethod === 'S256'
+  }
+
+  private async generateTokenResponse (authCode: AuthCodeModel, authorization: OauthTokenModel): Promise<OauthTokenResponse> {
+    const accessToken = await this.encrypter.encrypt(authCode.accountId, this.timeExpiresIn)
+    const refreshToken = await this.hasher.hash('')
+
+    await this.storeRefreshToken(refreshToken, authCode.accountId, authorization.clientId)
+    await this.deleteAuthCodeRepository.delete(authCode.code, authorization.clientId)
+
+    return {
+      accessToken,
+      refreshToken,
+      expiresIn: this.timeExpiresIn,
+      tokenType: 'Bearer'
+    }
+  }
+
+  private async storeRefreshToken (refreshToken: string, accountId: string, clientId: string): Promise<void> {
+    await this.refreshTokenMongoRepository.add({
+      token: refreshToken,
+      accountId,
+      clientId,
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24) // 24 hours
+    })
+  }
+
+  private async handleRefreshTokenGrant (authorization: OauthTokenModel): Promise<OauthTokenResponse | null> {
+    if (!authorization.refreshToken) {
+      return null
+    }
+
+    const refreshToken = await this.refreshTokenMongoRepository.load(authorization.refreshToken)
+    if (!refreshToken) {
+      return null
+    }
+
+    if (refreshToken.expiresAt < new Date()) {
+      return null
+    }
+
+    const accessToken = await this.encrypter.encrypt(refreshToken.accountId, this.timeExpiresIn)
+
+    return {
+      accessToken,
+      refreshToken: authorization.refreshToken,
+      expiresIn: this.timeExpiresIn,
+      tokenType: 'Bearer'
     }
   }
 }

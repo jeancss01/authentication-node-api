@@ -4,14 +4,20 @@ API de autenticação moderna baseada em Node.js, TypeScript e Express, com supo
 
 # Análise de Qualidade
 
+## Análise de Qualidade SonarCloud
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=coverage)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=bugs)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
+
+| Métrica | Valor | Status |
+|---------|-------|---------|
+| **Quality Gate** | ![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=alert_status) | ✅ |
+| **Cobertura** | ![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=coverage) | Target: 95%+ |
+| **Bugs** | ![Bugs](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=bugs) | Target: 0 |
+| **Vulnerabilidades** | ![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=vulnerabilities) | Target: 0 |
+| **Code Smells** | ![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=code_smells) | Minimizado |
+| **Manutenibilidade** | ![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=sqale_rating) | Target: A |
+| **Confiabilidade** | ![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=reliability_rating) | Target: A |
+| **Segurança** | ![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=security_rating) | Target: A |
 
 ## Análise de Qualidade de Código
 
