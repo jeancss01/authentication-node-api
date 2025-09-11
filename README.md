@@ -2,11 +2,37 @@
 
 API de autenticação moderna baseada em Node.js, TypeScript e Express, com suporte a OAuth 2.0 + PKCE, arquitetura em camadas (Clean Architecture) e testes automatizados
 
-[![CI](https://github.com/jeancss01/authentication-node-api/actions/workflows/ci.yml/badge.svg)](https://github.com/jeancss01/authentication-node-api/actions/workflows/ci.yml)
+# Análise de Qualidade
+
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=coverage)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=bugs)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=jeancss01_authentication-node-api&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=jeancss01_authentication-node-api)
+
+## Análise de Qualidade de Código
+
+Este projeto implementa análise contínua de qualidade através do SonarCloud, garantindo:
+
+### Métricas Monitoradas
+- **Cobertura de Testes**: Porcentagem de código coberto por testes automatizados
+- **Detecção de Bugs**: Identificação de potenciais defeitos no código
+- **Vulnerabilidades de Segurança**: Análise de segurança e boas práticas
+- **Code Smells**: Detecção de padrões que afetam a manutenibilidade
+- **Duplicação de Código**: Identificação de código repetido desnecessário
+- **Complexidade Ciclomática**: Medição da complexidade dos métodos
+
+### Quality Gate
+O projeto mantém um Quality Gate rigoroso que garante:
+- Cobertura mínima de 80%
+- Zero bugs críticos
+- Zero vulnerabilidades de segurança
+- Maintainability Rating A
+- Reliability Rating A
+- Security Rating A
 
 ## 🚀 Funcionalidades
 
