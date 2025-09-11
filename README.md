@@ -33,7 +33,7 @@ Este projeto implementa análise contínua de qualidade através do SonarCloud, 
 
 ### Quality Gate
 O projeto mantém um Quality Gate rigoroso que garante:
-- Cobertura mínima de 80%
+- Cobertura mínima de 95%
 - Zero bugs críticos
 - Zero vulnerabilidades de segurança
 - Maintainability Rating A
